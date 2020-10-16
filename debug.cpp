@@ -1,4 +1,3 @@
-
 struct Error {
 	template<class T1, class T2> Error& operator << (pair<T1, T2> p) {
 		return *this << "(" << p.first << ", " << p.second << ")";
@@ -9,9 +8,8 @@ struct Error {
 	}
 	template<class T> typename enable_if<!is_scalar<T>::value && !is_same<T,string>::value, Error&>::type operator << (T a) {
 		*this << "{";
-		for (auto it = a.begin(); it != a.end(); it++) {
+		for (auto it = a.begin(); it != a.end(); it++) 
 			*this << ", " + 2 * (it == a.begin()) << *it;
-		}
 		return *this << "}";
 	}
 	template<class T1, class T2, class T3> Error& operator << (tuple<T1,T2,T3> t) {
@@ -43,3 +41,17 @@ struct Error {
 
 #define err Error()
 
+template<class T> void dout(string name, T arg) {
+	err << name << " : " << arg << "\n";
+}
+
+template<class T1, class... T2> void dout(string names, T1 arg, T2... args) {
+	err << names.substr(0, names.find(",")) << " : " << arg << " | ";
+	dout(names.substr(names.find(",") + 2), args...);
+}
+
+#ifdef LOCAL
+	#define debug(...) dout(#__VA_ARGS__, __VA_ARGS__)
+#else
+	#define debug(...) 123
+#endif
